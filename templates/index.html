@@ -3,18 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Q&A</title>
+    <title>Interactive Q&A with Real-Time Summarization</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
 <body>
-<h1>Interactive Q&A</h1>
+<h1>Interactive Q&A with Real-Time Summarization</h1>
+
+<h2>Document Summaries</h2>
+<ul id="summaries">
+    {% if file_summaries %}
+    {% for filename, summary in file_summaries.items() %}
+    <li>
+        <strong>{{ filename }}</strong>: {{ summary }}
+    </li>
+    {% endfor %}
+    {% else %}
+    <li>No documents have been processed yet.</li>
+    {% endif %}
+</ul>
+
+<h2>Load Documents</h2>
+<button onclick="loadDocuments()">Load Documents</button>
+<div id="progress">
+    <p>Progress: <span id="current-progress">0</span>/<span id="total-progress">0</span></p>
+    <p>Currently processing: <span id="current-file">N/A</span></p>
+</div>
+
+<h2>Ask a Question</h2>
 <form method="post">
-    <label for="question">Ask a question:</label><br>
+    <label for="question">Your Question:</label><br>
     <input type="text" id="question" name="question" required><br><br>
     <button type="submit">Submit</button>
 </form>
 
 {% if question %}
-<h2>Question:</h2>
+<h2>Your Question:</h2>
 <p>{{ question }}</p>
 
 {% if answer %}
@@ -24,5 +47,26 @@
 <p>No answer could be found.</p>
 {% endif %}
 {% endif %}
+
+<script>
+    const socket = io();
+
+    function loadDocuments() {
+        fetch("/load", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    // Reload the page to display updated summaries
+                    location.reload();
+                }
+            });
+
+        socket.on("progress", (data) => {
+            document.getElementById("current-progress").textContent = data.current;
+            document.getElementById("total-progress").textContent = data.total;
+            document.getElementById("current-file").textContent = data.file;
+        });
+    }
+</script>
 </body>
 </html>
