@@ -2,7 +2,8 @@ import os
 from flask import Flask, request, render_template
 from PyPDF2 import PdfReader
 from bs4 import BeautifulSoup
-from transformers import pipeline
+from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer, AutoModelForQuestionAnswering
+
 
 app = Flask(__name__)
 
@@ -55,9 +56,35 @@ def combine_folder_contents(content):
                 print(f"Skipping unsupported file: {file}")
     return combined_text
 
-# Load QA model
-# Load QA model
-qa_pipeline = pipeline("question-answering", model="distilbert-base-uncased-distilled-squad")
+
+# Specify the models you need
+summarizer_model = "t5-small"
+qa_model = "distilbert-base-uncased-distilled-squad"
+
+# Load and save summarization pipeline
+summarizer = pipeline("summarization", model=summarizer_model)
+summarizer.model.save_pretrained("./t5-small", safe_serialization=False)
+summarizer.tokenizer.save_pretrained("./t5-small", safe_serialization=False)
+
+# Load and save QA pipeline
+qa_pipeline = pipeline("question-answering", model=qa_model)
+qa_pipeline.model.save_pretrained("./distilbert-base-uncased-distilled-squad", safe_serialization=False)
+qa_pipeline.tokenizer.save_pretrained("./distilbert-base-uncased-distilled-squad", safe_serialization=False)
+
+# Load summarization model and tokenizer locally
+summarizer = pipeline(
+    "summarization",
+    model=AutoModelForSeq2SeqLM.from_pretrained("./t5-small"),
+    tokenizer=AutoTokenizer.from_pretrained("./t5-small")
+)
+
+# Load question-answering model and tokenizer locally
+qa_pipeline = pipeline(
+    "question-answering",
+    model=AutoModelForQuestionAnswering.from_pretrained("./distilbert-base-uncased-distilled-squad"),
+    tokenizer=AutoTokenizer.from_pretrained("./distilbert-base-uncased-distilled-squad")
+)
+
 
 # Route for the home page
 @app.route("/", methods=["GET", "POST"])

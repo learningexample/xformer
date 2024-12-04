@@ -63,7 +63,20 @@ def summarize_text(text, summarizer, chunk_size=512, max_summary_length=128):
     return " ".join(summaries)
 
 # Initialize the summarizer model
-summarizer = pipeline("summarization", model="t5-small")
+# summarizer = pipeline("summarization", model="t5-small")
+# Specify the models you need
+summarizer_model = "t5-small"
+qa_model = "distilbert-base-uncased-distilled-squad"
+
+# Load and save summarization pipeline
+summarizer = pipeline("summarization", model=summarizer_model)
+summarizer.model.save_pretrained("./t5-small")
+summarizer.tokenizer.save_pretrained("./t5-small")
+
+# Load and save QA pipeline
+qa_pipeline = pipeline("question-answering", model=qa_model)
+qa_pipeline.model.save_pretrained("./distilbert-base-uncased-distilled-squad")
+qa_pipeline.tokenizer.save_pretrained("./distilbert-base-uncased-distilled-squad")
 
 # Specify the folder containing content
 content = "content"
