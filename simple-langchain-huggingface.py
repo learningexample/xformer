@@ -5,6 +5,7 @@ from datasets import Dataset
 from langchain.document_loaders import PyPDFLoader
 
 # pip install langchain langchain-community chromadb faiss-cpu pypdf sentence-transformers llama-cpp-python requests tqdm
+# pip install transformers[torch] datasets
 
 # 1️ Load a Small Model from Hugging Face
 MODEL_NAME = "google/flan-t5-small"  # Tiny 60M param model (~200MB)
