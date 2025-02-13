@@ -9,6 +9,8 @@ from langchain_community.llms import LlamaCpp
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 
+# pip install langchain langchain-community chromadb faiss-cpu pypdf sentence-transformers llama-cpp-python requests tqdm
+
 # Step 1: Define Model Path and URL
 MODEL_DIR = "models"
 MODEL_FILENAME = "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
