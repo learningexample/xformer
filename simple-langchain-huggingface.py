@@ -32,14 +32,15 @@ if not documents:
 
 dataset = Dataset.from_dict({"text": documents})
 
-# 4️ Tokenization Function (Fixes `decoder_input_ids` Issue)
+# 4️ Tokenization Function (Updated for newer Transformers versions)
 def tokenize_function(examples):
     model_inputs = tokenizer(examples["text"], truncation=True, padding="max_length", max_length=128)
-
-    # Set decoder inputs (important for T5 models)
-    with tokenizer.as_target_tokenizer():
-        model_inputs["labels"] = tokenizer(examples["text"], truncation=True, padding="max_length", max_length=128)["input_ids"]
-
+    
+    # Set labels directly using the decoder's vocabulary
+    # This replaces the deprecated as_target_tokenizer() context manager
+    labels = tokenizer(examples["text"], truncation=True, padding="max_length", max_length=128)
+    model_inputs["labels"] = labels["input_ids"]
+    
     return model_inputs
 
 # Tokenize dataset
@@ -52,7 +53,9 @@ training_args = TrainingArguments(
     num_train_epochs=2,  # Reduce epochs to save RAM
     save_strategy="epoch",
     logging_dir="./logs",
-    fp16=False,  # Avoid FP16 on CPU (only use for GPU)
+    # Modern precision config instead of deprecated fp16 parameter
+    bf16=False,
+    fp16=False, 
 )
 
 # 6️ Fine-Tune the Model
@@ -75,10 +78,10 @@ def generate_text(prompt):
     model = AutoModelForSeq2SeqLM.from_pretrained("./tiny_model")
     tokenizer = AutoTokenizer.from_pretrained("./tiny_model")
     
-    # Tokenize input text
-    inputs = tokenizer(prompt, return_tensors="pt", truncation=True, padding="max_length", max_length=128)
+    # Tokenize input text - don't need max_length for generation
+    inputs = tokenizer(prompt, return_tensors="pt", truncation=True)
 
-    # Generate text (Fix: Use max_new_tokens instead of max_length)
+    # Generate text with consistent max_new_tokens parameter
     outputs = model.generate(**inputs, max_new_tokens=100)  # Adjust tokens as needed
     
     return tokenizer.decode(outputs[0], skip_special_tokens=True)

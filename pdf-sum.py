@@ -57,8 +57,8 @@ def summarize_text(text, summarizer, chunk_size=512, max_summary_length=128):
     chunks = [text[i:i + chunk_size] for i in range(0, len(text), chunk_size)]
     summaries = []
     for chunk in chunks:
-        # Summarize each chunk with a shorter max_length
-        summary = summarizer(chunk, max_length=max_summary_length, min_length=30, do_sample=False)
+        # Summarize each chunk with modern parameters
+        summary = summarizer(chunk, max_length=max_summary_length, min_length=30, num_beams=4)
         summaries.append(summary[0]['summary_text'])
     return " ".join(summaries)
 

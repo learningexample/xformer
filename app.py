@@ -63,13 +63,13 @@ qa_model = "distilbert-base-uncased-distilled-squad"
 
 # Load and save summarization pipeline
 summarizer = pipeline("summarization", model=summarizer_model)
-summarizer.model.save_pretrained("./t5-small", safe_serialization=False)
-summarizer.tokenizer.save_pretrained("./t5-small", safe_serialization=False)
+summarizer.model.save_pretrained("./t5-small")
+summarizer.tokenizer.save_pretrained("./t5-small")
 
 # Load and save QA pipeline
 qa_pipeline = pipeline("question-answering", model=qa_model)
-qa_pipeline.model.save_pretrained("./distilbert-base-uncased-distilled-squad", safe_serialization=False)
-qa_pipeline.tokenizer.save_pretrained("./distilbert-base-uncased-distilled-squad", safe_serialization=False)
+qa_pipeline.model.save_pretrained("./distilbert-base-uncased-distilled-squad")
+qa_pipeline.tokenizer.save_pretrained("./distilbert-base-uncased-distilled-squad")
 
 # Load summarization model and tokenizer locally
 summarizer = pipeline(
@@ -102,14 +102,18 @@ def index():
 
     return render_template("index.html", question=question, answer=answer)
 
-# Load the folder content on server start
-@app.before_request
-def load_data():
+# Initialize the app with data
+def init_app():
     global combined_text
     folder_path = "contents"  # Replace with your folder path
     print("Loading content from folder...")
     combined_text = combine_folder_contents(folder_path)
     print("Content loaded successfully.")
 
+# Call the initialization function
+init_app()
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Use environment variable for debug mode, default to False for safety
+    debug_mode = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    app.run(debug=debug_mode)

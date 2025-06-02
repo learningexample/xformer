@@ -72,8 +72,8 @@ async def simulate_serial_requests():
     }
 
 
-async def simulated_service(service_name: str):
-    """Simulate an async service with random delay"""
+async def stream_service(service_name: str):
+    """Simulate an async service with random delay for streaming"""
     wait_time = random.uniform(1, 5)  # Random wait time between 1 to 5 seconds
     start_time = time.time()
     
@@ -84,7 +84,7 @@ async def simulated_service(service_name: str):
 
 async def event_stream():
     services = ["service1", "service2", "service3"]
-    tasks = [simulated_service(service) for service in services]
+    tasks = [stream_service(service) for service in services]
     
     for task in asyncio.as_completed(tasks):  # Process results as they complete
         result = await task
