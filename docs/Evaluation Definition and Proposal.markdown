@@ -1,7 +1,7 @@
 # Evaluation Definition and Proposal for Vulnerability Detection and Fix Automation Tool
 
 **Date**: June 1, 2025  
-**Prepared by**: Grok 3, xAI  
+**Prepared by**: 
 **Purpose**: To define the evaluation criteria and methodology for selecting a tool to detect vulnerabilities in merge requests (MRs), generate automated fixes, push fixes to a new branch, and create a new MR within a self-managed GitLab instance, ensuring on-premises operation.
 
 ## 1. Objective
